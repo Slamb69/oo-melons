@@ -4,13 +4,22 @@
 class AbstractMelonOrder(object):
     """An abstract base class that other Melon Orders inherit from."""
 
-    def __init__(self, species, qty, order_type, tax):
+    def __init__(self,
+                 species,
+                 qty,
+                 country_code="USA"):
         """Initialize melon attributes."""
+
         self.species = species
         self.qty = qty
         self.shipped = False
-        self.order_type = order_type
-        self.tax = tax
+        self.passed_inspection = Falsemar
+        # if order_type:
+        #     self.order_type = order_type
+        # if tax:
+        #     self.tax = tax
+        # if country_code:
+        #     self.country_code = country_code
 
     def get_total(self):
         """Calculate price, including tax."""
@@ -36,29 +45,21 @@ class AbstractMelonOrder(object):
 class DomesticMelonOrder(AbstractMelonOrder):
     """A melon order within the USA."""
 
-    def __init__(self, species, qty):
-        """Initialize melon order attributes."""
-
-        tax = 0.08
-
-        super(DomesticMelonOrder, self).__init__(species,
-                                                 qty,
-                                                 "domestic",
-                                                 tax)
+    tax = 0.08
+    order_type = "domestic"
+    country_code = "USA"
 
 
 class InternationalMelonOrder(AbstractMelonOrder):
     """An international (non-US) melon order."""
 
+    tax = 0.17
+    order_type = "international"
+
     def __init__(self, species, qty, country_code):
-        """Initialize melon order attributes."""
+        """Initialize international order with country_code."""
 
-        tax = 0.17
-
-        super(InternationalMelonOrder, self).__init__(species,
-                                                      qty,
-                                                      'international',
-                                                      tax)
+        super(InternationalMelonOrder, self).__init__(species, qty, country_code)
         self.country_code = country_code
 
     def get_country_code(self):
@@ -66,20 +67,23 @@ class InternationalMelonOrder(AbstractMelonOrder):
 
         return self.country_code
 
+    def get_total(self):
+        """Calculate price, including tax."""
+
+        # Call get_total method from Parent, set = total
+        total = super(InternationalMelonOrder, self).get_total()
+        # check < condition, add fee to total and return
+        if self.qty < 10:
+            total += 3
+
+        return total
+
 
 class GovernmentMelonOrder(AbstractMelonOrder):
     """A melon order for the US government."""
 
-    def __init__(self, species, qty):
-        """Initialize melon order attributes."""
-        tax = 0.0
-
-        super(GovernmentMelonOrder, self).__init__(species,
-                                                   qty,
-                                                   'government',
-                                                   tax)
-
-        self.passed_inspection = False
+    tax = 0.0
+    order_type = "government"
 
     def mark_inspection(self, passed):
         """Record the fact than an order has passed inspection."""
